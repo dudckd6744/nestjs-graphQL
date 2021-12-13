@@ -1,9 +1,11 @@
 /* eslint-disable @typescript-eslint/ban-types */
-import { UsePipes, ValidationPipe } from '@nestjs/common';
+import { UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { AuthGuard_renewal } from 'src/utils/jwt/auth.guard';
+import { ReqUser } from 'src/utils/jwt/user.decorater';
 
 import { CreateUserInput, LoginUserInput } from './dto/create-user.input';
-import { User } from './user.entity';
+import { User, UserSchema } from './user.entity';
 import { UserService } from './user.service';
 
 @Resolver((of) => User)
@@ -25,8 +27,10 @@ export class UserResolver {
         return token;
     }
 
+    // @UseGuards(AuthGuard_renewal)
     @Query((returns) => [User])
-    users(): Promise<User[]> {
+    users(@ReqUser() user: User): Promise<User[]> {
+        console.log(user);
         return this.usersService.findAll();
     }
 }
